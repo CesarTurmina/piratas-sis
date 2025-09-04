@@ -1,0 +1,30 @@
+{
+    "name": "piratas-sis",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "concurrently \"npm:dev:renderer\" \"npm:dev:main\"",
+        "dev:renderer": "vite",
+        "dev:main": "electron electron/main.js",
+        "build": "vite build && tsc -p tsconfig.json",
+        "dist": "electron-builder",
+        "postinstall": "electron-builder install-app-deps"
+    },
+    "devDependencies": {
+        "@types/node": "^22.5.1",
+        "@types/react": "^18.3.4",
+        "@types/react-dom": "^18.3.0",
+        "@vitejs/plugin-react": "^5.0.2",
+        "concurrently": "^9.0.1",
+        "electron": "^31.7.7",
+        "electron-builder": "^25.1.8",
+        "tsx": "^4.16.2",
+        "typescript": "^5.5.4",
+        "vite": "^5.4.10"
+    },
+    "dependencies": {
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1"
+    }
+}
