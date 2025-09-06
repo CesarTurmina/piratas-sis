@@ -1,8 +1,28 @@
-// electron/main.js
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath } from "url";
 import { store } from "./store.js";
+
+// IPC Handlers
+ipcMain.handle("toggle-window", (_event, action) => {
+  if (!mainWindow) return;
+
+  const { width: screenW, height: screenH } =
+    screen.getPrimaryDisplay().workAreaSize;
+
+  if (action === "expand") {
+    const winW = 960;
+    const winH = 720;
+    mainWindow.setSize(winW, winH);
+    mainWindow.center();
+  } else {
+    const winW = 120;
+    const winH = 120;
+    const x = screenW - winW - 20;
+    const y = screenH - winH - 40;
+    mainWindow.setBounds({ x, y, width: winW, height: winH });
+  }
+});
 
 // Employees
 ipcMain.handle("add-employee", (_event, { name, role }) =>
@@ -11,6 +31,7 @@ ipcMain.handle("add-employee", (_event, { name, role }) =>
 ipcMain.handle("list-employees", (_event, activeOnly) =>
   store.listEmployees(activeOnly)
 );
+
 // Charges
 ipcMain.handle("add-charge", (_event, p) =>
   store.addCharge(p.employeeId, p.item, p.amountCents, p.whenISO)
@@ -24,20 +45,25 @@ ipcMain.handle("sum-charges", (_event, p) =>
 
 // Deliveries
 ipcMain.handle("add-delivery", (_event, p) =>
-  store.addDelivery(p.employeeId, p.count, p.tipsCents, p.discountCents, p.whenISO)
+  store.addDelivery(
+    p.employeeId,
+    p.count,
+    p.tipsCents,
+    p.discountCents,
+    p.whenISO
+  )
 );
 ipcMain.handle("list-deliveries", (_event, p) =>
-store.listDeliveries(p.ym, p.startDate, p.endDate, Number(p.employeeId))
+  store.listDeliveries(p.ym, p.startDate, p.endDate, Number(p.employeeId))
 );
 
 // Printing
 ipcMain.handle("print-report", async (_event, html) => {
   const printWindow = new BrowserWindow({ show: false });
-  await printWindow.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
-  printWindow.webContents.print({
-    silent: false,
-    printBackground: true,
-  });
+  await printWindow.loadURL(
+    "data:text/html;charset=utf-8," + encodeURIComponent(html)
+  );
+  printWindow.webContents.print({ silent: false, printBackground: true });
 });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -65,21 +91,35 @@ async function loadURLWithRetry(win, url, { retries = 40, delay = 250 } = {}) {
   );
 }
 
+// 👇 só essa createWindow deve existir
 async function createWindow() {
+  const { width: screenW, height: screenH } =
+    screen.getPrimaryDisplay().workAreaSize;
+
+  const winW = 120;
+  const winH = 120;
+  const x = screenW - winW - 20;
+  const y = screenH - winH - 40;
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: winW,
+    height: winH,
+    x,
+    y,
+    frame: false,
+    alwaysOnTop: true,
+    transparent: true,
+    resizable: false,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      preload: path.join(__dirname, "preload.cjs"), // 👈 renomeia o preload.js para preload.cjs
+      preload: path.join(__dirname, "preload.cjs"),
     },
     show: false,
   });
 
   if (isDev) {
     await loadURLWithRetry(mainWindow, "http://localhost:5173");
-    // mainWindow.webContents.openDevTools({ mode: "detach" });
   } else {
     const indexPath = path.join(__dirname, "../dist/index.html");
     await mainWindow.loadFile(indexPath);

@@ -8,24 +8,64 @@ type Tab = "contas" | "entregas" | "cadastro" | "relatorios";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("contas");
+  const [expanded, setExpanded] = useState(false);
 
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+    window.api.toggleWindow(expanded ? "shrink" : "expand");
+  };
+
+  if (!expanded) {
+    // 👉 estado recolhido: logo fixa no canto inferior direito
+    return (
+      <div
+        style={{
+          background: "transparent",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <img
+          src="/logo.png"
+          alt="logo"
+          onClick={toggleExpand}
+          style={{
+            height: 70,
+            cursor: "pointer",
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+            borderRadius: "50%", // 🔵 logo arredondada
+            userSelect: "none",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.25)", // sombra leve
+          }}
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
+  // 👉 estado expandido
   return (
     <div
       style={{
-        background: "#222", // fundo da tela
-        minHeight: "100vh",
+        width: "100%",
+        height: "100%",
+        background: "#fff",
         display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        padding: 20,
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        overflow: "hidden",
+        borderRadius: 12,
+        padding: 4,
+        boxSizing: "border-box",
       }}
     >
+      {/* Cabeçalho + conteúdo */}
       <div
         style={{
-          background: "#fff",
-          borderRadius: 8,
-          width: "90%",
-          maxWidth: 900,
+          width: "100%",
           padding: 20,
         }}
       >
@@ -41,16 +81,21 @@ export default function App() {
           <h2>PIRATAS LANCHES</h2>
           <div style={{ fontWeight: 600 }}>
             {new Date().toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
+              weekday: "long",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
             })}
-        </div>
+          </div>
           <img
-            src="/logo.png" // coloca tua logo aqui (pasta public/)
+            src="/logo.png"
             alt="logo"
-            style={{ height: 100 }}
+            onClick={toggleExpand}
+            style={{
+              height: 60,
+              cursor: "pointer",
+              borderRadius: "50%",
+            }}
           />
         </div>
 

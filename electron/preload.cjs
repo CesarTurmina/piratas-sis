@@ -4,6 +4,7 @@ console.log("⚡ Preload carregado!");
 
 contextBridge.exposeInMainWorld("api", {
   addEmployee: (name, role) => ipcRenderer.invoke("add-employee", { name, role }),
+  toggleWindow: (action) => ipcRenderer.invoke("toggle-window", action),
   listEmployees: (activeOnly) => ipcRenderer.invoke("list-employees", activeOnly),
   addCharge: (p) => ipcRenderer.invoke("add-charge", p),
   listCharges: (p) => ipcRenderer.invoke("list-charges", p),

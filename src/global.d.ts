@@ -5,6 +5,7 @@ declare global {
     api: {
       addEmployee: (name: string, role: string) => Promise<any>;
       listEmployees: (activeOnly?: boolean) => Promise<any[]>;
+      toggleWindow: (action: "expand" | "shrink") => Promise<void>;
 
       addCharge: (p: {
         employeeId: number;
