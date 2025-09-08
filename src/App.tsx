@@ -3,6 +3,7 @@ import Contas from "./components/Contas";
 import Entregas from "./components/Entregas";
 import Cadastro from "./components/Cadastro";
 import Relatorios from "./components/Relatorios";
+import logoSrc from "./assets/logo.png";
 
 type Tab = "contas" | "entregas" | "cadastro" | "relatorios";
 
@@ -26,9 +27,11 @@ export default function App() {
         }}
       >
         <img
-          src="/logo.png"
+          src={logoSrc}
           alt="logo"
           onClick={toggleExpand}
+          onMouseEnter={() => window.api.setIgnoreMouseEvents(false)}
+          onMouseLeave={() => window.api.setIgnoreMouseEvents(true)} 
           style={{
             height: 70,
             cursor: "pointer",
@@ -88,7 +91,7 @@ export default function App() {
             })}
           </div>
           <img
-            src="/logo.png"
+            src={logoSrc}
             alt="logo"
             onClick={toggleExpand}
             style={{

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen, Tray, Menu } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { store } from "./store.js";
@@ -43,6 +43,17 @@ ipcMain.handle("sum-charges", (_event, p) =>
   store.sumCharges(p.employeeId, p.monthISO, p.startDate, p.endDate)
 );
 
+//ignore mouse events
+ipcMain.on("set-ignore-mouse-events", (_event, ignore) => {
+  if (mainWindow) {
+    if (ignore) {
+      mainWindow.setIgnoreMouseEvents(true, { forward: true });
+    } else {
+      mainWindow.setIgnoreMouseEvents(false);
+    }
+  }
+});
+
 // Deliveries
 ipcMain.handle("add-delivery", (_event, p) =>
   store.addDelivery(
@@ -71,6 +82,7 @@ const __dirname = path.dirname(__filename);
 
 const isDev = !app.isPackaged;
 let mainWindow;
+let tray;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -108,7 +120,8 @@ async function createWindow() {
     y,
     frame: false,
     alwaysOnTop: true,
-    transparent: true,
+    transparent: true, // 👈 tira temporariamente
+    //backgroundColor: "#fff", // 👈 garante fundo branco
     resizable: false,
     webPreferences: {
       contextIsolation: true,
@@ -121,14 +134,34 @@ async function createWindow() {
   if (isDev) {
     await loadURLWithRetry(mainWindow, "http://localhost:5173");
   } else {
-    const indexPath = path.join(__dirname, "../dist/index.html");
+    const indexPath = path.join(app.getAppPath(), "dist", "index.html");
+    console.log("👉 Carregando index:", indexPath);
     await mainWindow.loadFile(indexPath);
+    // mainWindow.webContents.openDevTools({ mode: "detach" }); // Mantenha para debug, remova para versão final
   }
 
-  mainWindow.once("ready-to-show", () => mainWindow.show());
+  const iconPath = path.join(__dirname, "../public/logo.ico"); // ou logo.ico se converter
+  tray = new Tray(iconPath);
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Abrir", click: () => mainWindow.show() },
+    { label: "Fechar", click: () => app.quit() },
+  ]);
+
+  tray.setToolTip("Piratas SIS");
+  tray.setContextMenu(contextMenu);
+
+  tray.on("double-click", () => {
+    mainWindow.show();
+  });
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindow.show();
+    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+  });
+
   mainWindow.on("closed", () => (mainWindow = null));
 }
-
 app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {

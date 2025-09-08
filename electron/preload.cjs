@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld("api", {
   addDelivery: (p) => ipcRenderer.invoke("add-delivery", p),
   listDeliveries: (p) => ipcRenderer.invoke("list-deliveries", p),
   printReport: (html) => ipcRenderer.invoke("print-report", html),
+  setIgnoreMouseEvents: (ignore) => ipcRenderer.send('set-ignore-mouse-events', ignore),
 });

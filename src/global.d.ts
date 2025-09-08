@@ -32,7 +32,7 @@ declare global {
         tipsCents: number;
         discountCents: number;
         whenISO: string;
-        }) => Promise<any>;
+      }) => Promise<any>;
       listDeliveries: (p: {
         employeeId?: number;
         ym?: string;
@@ -40,6 +40,11 @@ declare global {
         endDate?: string;
       }) => Promise<any[]>;
       printReport: (html: string) => Promise<void>;
+      setIgnoreMouseEvents: (ignore: boolean) => void;
     };
   }
+}
+declare module "*.png" {
+  const value: string;
+  export default value;
 }
