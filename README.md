@@ -49,7 +49,7 @@ O sistema foi construído com tecnologias modernas, utilizando **Electron** para
 
 ### 2. Clone o repositório
 ```bash
-git clone[(https://github.com/CesarTurmina/piratas-sis.git)]
+git clone[https://github.com/CesarTurmina/piratas-sis.git]
 cd piratas-sis
 ```
 
@@ -99,3 +99,4 @@ Após a conclusão, a versão compilada (por exemplo, **Piratas SIS 0.0.1.exe**)
 Este projeto é **open source**.  
 
 Sinta-se à vontade para usar, modificar e distribuir conforme necessário.
+
